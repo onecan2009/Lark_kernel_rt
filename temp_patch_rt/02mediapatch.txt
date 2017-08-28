@@ -1,0 +1,7 @@
+patching file drivers/media/video/rk_camsys/camsys_marvin.c
+Hunk #1 succeeded at 394 (offset -15 lines).
+Hunk #2 succeeded at 410 (offset -15 lines).
+Hunk #3 succeeded at 446 (offset -15 lines).
+Hunk #4 succeeded at 490 (offset -15 lines).
+patching file include/media/camsys_head.h
+Hunk #1 succeeded at 52 (offset -4 lines).

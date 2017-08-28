@@ -1,0 +1,6 @@
+patching file drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/dhd_config.c
+Hunk #1 FAILED at 497.
+1 out of 1 hunk FAILED -- saving rejects to file drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/dhd_config.c.rej
+patching file drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/dhd_gpio.c
+Hunk #1 FAILED at 30.
+1 out of 1 hunk FAILED -- saving rejects to file drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/dhd_gpio.c.rej

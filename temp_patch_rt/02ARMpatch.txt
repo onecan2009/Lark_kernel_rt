@@ -1,0 +1,6 @@
+patching file arch/arm/configs/rockchip_defconfig
+Hunk #3 FAILED at 42.
+Hunk #4 FAILED at 305.
+Hunk #5 FAILED at 346.
+Hunk #6 FAILED at 656.
+4 out of 6 hunks FAILED -- saving rejects to file arch/arm/configs/rockchip_defconfig.rej

@@ -1,0 +1,20 @@
+#
+# ups device configuration
+#
+
+menuconfig GFD_HARDWARE_MODULES
+	tristate "GFD Hardware Support"
+	default y
+	---help---
+	  add by terry 2015-12-14
+
+if GFD_HARDWARE_MODULES
+
+config RK3288_LARK_UPS
+	tristate "lark_ups Support"
+	default y
+	---help---
+	  When the power is turned off, the shutdown operation is performed
+
+	  
+endif # TMP122

@@ -1,0 +1,46 @@
+patching file arch/arm/configs/rockchip_defconfig
+Hunk #1 succeeded at 54 (offset -2 lines).
+patching file arch/arm/mach-rockchip/rk_fiq_debugger.c
+Hunk #1 FAILED at 519.
+1 out of 1 hunk FAILED -- saving rejects to file arch/arm/mach-rockchip/rk_fiq_debugger.c.rej
+can't find file to patch at input line 57
+Perhaps you used the wrong -p or --strip option?
+The text leading up to this was:
+--------------------------
+|diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+|index 6489c0f..b9d56d4 100644
+|--- a/drivers/block/zram/Kconfig
+|+++ b/drivers/block/zram/Kconfig
+--------------------------
+File to patch: 
+Skip this patch? [y] 
+Skipping patch.
+1 out of 1 hunk ignored
+patching file drivers/cpuidle/cpuidle.h
+patching file drivers/cpuidle/driver.c
+patching file drivers/cpuidle/sysfs.c
+patching file drivers/pinctrl/pinctrl-rockchip.c
+Hunk #9 succeeded at 1360 with fuzz 2.
+Hunk #10 succeeded at 1389 (offset -6 lines).
+Hunk #11 succeeded at 1744 with fuzz 2 (offset -6 lines).
+Hunk #12 succeeded at 1751 with fuzz 2 (offset -11 lines).
+Hunk #13 succeeded at 1771 (offset -11 lines).
+Hunk #14 succeeded at 1810 (offset -11 lines).
+Hunk #15 succeeded at 1849 (offset -11 lines).
+Hunk #16 succeeded at 2378 (offset -11 lines).
+Hunk #17 succeeded at 2386 (offset -11 lines).
+Hunk #18 succeeded at 2588 (offset -11 lines).
+Hunk #19 succeeded at 2629 (offset -11 lines).
+Hunk #20 succeeded at 2692 (offset -11 lines).
+Hunk #21 succeeded at 2702 (offset -11 lines).
+Hunk #22 succeeded at 2716 (offset -11 lines).
+Hunk #23 succeeded at 2732 (offset -11 lines).
+Hunk #24 succeeded at 3028 (offset -11 lines).
+patching file drivers/usb/dwc_otg_310/dwc_otg_hcd_linux.c
+Hunk #1 succeeded at 415 (offset -11 lines).
+patching file drivers/usb/dwc_otg_310/dwc_otg_pcd_linux.c
+Hunk #1 succeeded at 1451 (offset -5 lines).
+patching file drivers/usb/host/ehci-rockchip.c
+Hunk #1 succeeded at 142 (offset 31 lines).
+patching file kernel/lockdep_internals.h
+patching file sound/soc/soc-core.c

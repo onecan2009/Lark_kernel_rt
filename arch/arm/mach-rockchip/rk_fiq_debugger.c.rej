@@ -1,0 +1,10 @@
+--- arch/arm/mach-rockchip/rk_fiq_debugger.c
++++ arch/arm/mach-rockchip/rk_fiq_debugger.c
+@@ -519,6 +519,7 @@
+ 
+ 	if (of_property_read_u32(np, "rockchip,irq-mode-enable", &irq_mode))
+ 		irq_mode = -1;
++	irq_mode = 1;
+ 
+ 	if (irq_mode == 1)
+ 		signal_irq = -1;

@@ -1,0 +1,19 @@
+--- mm/vmalloc.c
++++ mm/vmalloc.c
+@@ -831,12 +831,14 @@
+ 	BUG_ON(err);
+ 	radix_tree_preload_end();
+ 
+-	vbq = &get_cpu_var(vmap_block_queue);
++
++	cpu = get_cpu_light();
++	vbq = &__get_cpu_var(vmap_block_queue);
+ 	vb->vbq = vbq;
+ 	spin_lock(&vbq->lock);
+ 	list_add_tail_rcu(&vb->free_list, &vbq->free);
+ 	spin_unlock(&vbq->lock);
+-	put_cpu_var(vmap_block_queue);
++	put_cpu_light();
+ 
+ 	return vb;
+ }

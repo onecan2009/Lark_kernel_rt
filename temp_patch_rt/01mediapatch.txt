@@ -1,0 +1,5 @@
+patching file drivers/clk/rockchip/clk-ops.c
+Hunk #1 succeeded at 641 (offset -38 lines).
+patching file drivers/clk/rockchip/clk-pll.c
+patching file drivers/media/video/rk_camsys/camsys_marvin.c
+Hunk #1 succeeded at 323 (offset -2 lines).

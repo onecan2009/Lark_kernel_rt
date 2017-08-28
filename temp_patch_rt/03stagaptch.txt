@@ -1,0 +1,42 @@
+can't find file to patch at input line 34
+Perhaps you used the wrong -p or --strip option?
+The text leading up to this was:
+--------------------------
+|From 40340582d4a6916e718855d52c7802fb176954c0 Mon Sep 17 00:00:00 2001
+|From: Zheng Yang <zhengyang@rock-chips.com>
+|Date: Tue, 19 Jul 2016 16:54:06 +0800
+|Subject: [PATCH 3/6] staging: iio : imu: support parse more config from dts
+|MIME-Version: 1.0
+|Content-Type: text/plain; charset=UTF-8
+|Content-Transfer-Encoding: 8bit
+|
+|We can configure mpu int_config、level_shifter、orientation,
+|and 2nd slave device in dts.
+|To enable 2nd slave device, such as compass AK8963, we can
+|set following configuration in dts file:
+|
+|mpu9250@68 {
+|	compatible = "invensense,mpu9250";
+|        reg = <0x68>;
+|        irq-gpio = <&gpio8 GPIO_A0 IRQ_TYPE_LEVEL_LOW>;
+|        mpu-sec_slave_type = <2>; //SECONDARY_SLAVE_TYPE_COMPASS
+|        mpu-sec_slave_id = <18>; //COMPASS_ID_AK8963
+|        mpu-secondary_i2c_addr = <0x0c>;
+|        status = "okay";
+|};
+|
+|Change-Id: I0dc4b027f56031c80e37fa356b7c3ed8bc9eaf63
+|Signed-off-by: Zheng Yang <zhengyang@rock-chips.com>
+|---
+| drivers/staging/iio/imu/inv_mpu/inv_mpu_core.c | 158 +++++++++----------------
+| 1 file changed, 58 insertions(+), 100 deletions(-)
+|
+|diff --git a/drivers/staging/iio/imu/inv_mpu/inv_mpu_core.c b/drivers/staging/iio/imu/inv_mpu/inv_mpu_core.c
+|index b1f5169..4fc2a7c 100644
+|--- a/drivers/staging/iio/imu/inv_mpu/inv_mpu_core.c
+|+++ b/drivers/staging/iio/imu/inv_mpu/inv_mpu_core.c
+--------------------------
+File to patch: 
+Skip this patch? [y] 
+Skipping patch.
+1 out of 1 hunk ignored

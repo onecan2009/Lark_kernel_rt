@@ -1,0 +1,2 @@
+patching file arch/arm/boot/dts/rk3288-uav-sdk.dts
+patching file arch/arm/boot/dts/rk3288-uav.dtsi
