@@ -1643,7 +1643,7 @@ static int rtl8152_probe(struct usb_interface *intf,
 
 	tp = netdev_priv(netdev);
 	tp->msg_enable = 0x7FFF;
-
+    
 	tasklet_init(&tp->tl, rx_fixup, (unsigned long)tp);
 	INIT_DELAYED_WORK(&tp->schedule, rtl_work_func_t);
 
@@ -1652,6 +1652,10 @@ static int rtl8152_probe(struct usb_interface *intf,
 	netdev->netdev_ops = &rtl8152_netdev_ops;
 	netdev->watchdog_timeo = RTL8152_TX_TIMEOUT;
 	netdev->features &= ~NETIF_F_IP_CSUM;
+    
+    //try to set ether interface to a specfic name sb-eth0 @sampson
+    strncpy(netdev->name,"usb-eth0",strlen("usb-eth0"));
+    
 	SET_ETHTOOL_OPS(netdev, &ops);
 	tp->speed = 0;
 
