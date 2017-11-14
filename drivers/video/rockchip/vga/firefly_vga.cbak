@@ -15,9 +15,8 @@
 #define DDC_I2C_RATE		50*1000
 #define EDID_LENGTH 128
 
-#define DEFAULT_MODE      10
+#define DEFAULT_MODE      3
 
-extern char *disppara;
 extern  struct fb_videomode sda7123_vga_mode[];
 extern int get_vga_mode_len(void);
 
@@ -297,52 +296,9 @@ static struct fb_videomode *vga_find_best_mode(void)
 	return best;
 }
 
-
-/*
- *  Get the resolution by passing the parameters
- *  @sampson
- */
-
-static int default_mode(char *disp)
-{
-    printk("%s() disp is %s\n",__func__,disp);
-    if(disp == NULL)
-    {
-        return DEFAULT_MODE;
-    }
-    else
-    {
-        if(strcmp(disp,"1280x720") == 0)
-        {
-            return 4;
-        }
-        else if(strcmp(disp,"1920x1080") == 0)
-        {
-            return 10;
-        }
-        else if(strcmp(disp,"3840x2160") == 0)
-        {
-            return 3;
-        }
-        else if(strcmp(disp,"1024x768") == 0)
-        {
-            return 3;
-        }
-        else if(strcmp(disp,"1366x768") == 0)
-        {
-            return 6;
-        }
-        else if(strcmp(disp,"1440x900") == 0)
-        {
-            return 7;
-        }
-    }
-}
-
 int vga_switch_default_screen(void)
 {
 	int i, mode_num = DEFAULT_MODE;
-    //int i, mode_num = 0;
 	const struct fb_videomode *mode = NULL;
 	static int init_flag = 0;
 	
@@ -350,10 +306,8 @@ int vga_switch_default_screen(void)
 		printk("vga-ddc: No DDC Dev.\n");
 		return -ENODEV;
 	}
-    //at first, get the default resolution
-    //mode_num = default_mode(disppara);
-	printk("%s(),mode_num is %d\n",__func__,mode_num);
-    mode = vga_find_best_mode();
+
+	mode = vga_find_best_mode();
 	if (mode) {
 		printk("vga-ddc: best mode %dx%d@%d[pixclock-%ld KHZ]\n", mode->xres, mode->yres,
 				mode->refresh, PICOS2KHZ(mode->pixclock));

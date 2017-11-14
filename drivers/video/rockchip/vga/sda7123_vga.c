@@ -16,7 +16,7 @@
 
 
 const struct fb_videomode sda7123_vga_mode[] = {
-	//name				refresh		xres	yres	pixclock			h_bp	h_fp	v_bp	v_fp	h_pw	v_pw	polariry	PorI	flag(used for vic)
+	//name				refresh		xres	yres	pixclock	h_bp	h_fp	v_bp	v_fp	h_pw	v_pw	polariry	PorI	flag(used for vic)
 	{"640x480p@60Hz",	60,			640,	480,	25000000,	48,		16,		33,	   10,		 96,	2,		0,			0,		1	},
 	{"800x600p@60Hz",	60,			800,	600,	40000000,	88,	    40,	    23,		1,		128,	4,		FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,			0,		0	},	
 	{"1024x768p@60Hz",	60,			1024,	768,	65000000,	160,	24,		29,		3,		136,	6,		0,			0,		0	},

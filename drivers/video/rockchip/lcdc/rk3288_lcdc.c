@@ -1073,14 +1073,20 @@ static int rk3288_lcdc_set_dclk(struct rk_lcdc_driver *dev_drv, int reset_rate)
 	    container_of(dev_drv, struct lcdc_device, driver);
 	struct rk_screen *screen = dev_drv->cur_screen;
 
-        if (reset_rate)
-	        ret = clk_set_rate(lcdc_dev->dclk, screen->mode.pixclock);/*set pll */
+    if (reset_rate)
+        ret = clk_set_rate(lcdc_dev->dclk, screen->mode.pixclock);/*set pll */
 	if (ret)
 		dev_err(dev_drv->dev, "set lcdc%d dclk failed\n", lcdc_dev->id);
+    //printk("##################################################\n");
+    //printk("screen->mode.pixclock = %u\n",screen->mode.pixclock);
+    //printk("lcdc_dev->dclk = %lu\n",clk_get_rate(lcdc_dev->dclk));
+    
 	lcdc_dev->pixclock =
 		 div_u64(1000000000000llu, clk_get_rate(lcdc_dev->dclk));
 	lcdc_dev->driver.pixclock = lcdc_dev->pixclock;
 	
+    //printk("lcdc_dev->pixclock = %lu\n",lcdc_dev->pixclock);
+    
 	fps = rk_fb_calc_fps(screen, lcdc_dev->pixclock);
 	screen->ft = 1000 / fps;
 	dev_info(lcdc_dev->dev, "%s: dclk:%lu>>fps:%d ",

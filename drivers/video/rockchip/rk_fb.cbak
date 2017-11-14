@@ -72,7 +72,6 @@ EXPORT_SYMBOL(video_data_to_mirroring);
 extern phys_addr_t uboot_logo_base;
 extern phys_addr_t uboot_logo_size;
 extern phys_addr_t uboot_logo_offset;
-extern char *disppara ; /*uboot parmeters*/
 static struct rk_fb_trsm_ops *trsm_lvds_ops;
 static struct rk_fb_trsm_ops *trsm_edp_ops;
 static struct rk_fb_trsm_ops *trsm_mipi_ops;
@@ -496,56 +495,6 @@ int rk_fb_video_mode_from_timing(const struct display_timing *dt,
 
 }
 
-/*
- *  parse disp from resource 
- *  @disp  is the disp_info
- *  @ return value is disp_timing->native_mode
- *  added by sampson 2017/1/10
- * 1280x720 [0]
- * 1920x1080 [1]
- * 3840x2160 [2]
- * 1024x768 [3]
- * 1366x768 [4]
- * 1440x900 [5] 
- * */
-static char* lcd_dts_timings[] = {
-    "1280x720",
-    "1920x1080",
-    "3840x2160",
-    "1024x768",
-    "1366x768",
-    "1440x900"
-    };
-    
-static int parse_disp(char *disppara)
-{
-    int i = 0;
-    printk("%s(),disp is %s\n",__func__,disppara);
-    /*  
-     * 假设没有解析出参数区的分辨率参数，
-     * 则设成1024x768，native-mode = 3
-     */
-    if(disppara == NULL)
-    {
-            printk("disp is  NULL,disp setup default 1024x768\n");
-            return 3;
-    }
-    else
-    {
-        for(i = 0;i < sizeof(lcd_dts_timings)/sizeof(lcd_dts_timings[0]);i++)
-        {
-            if(strcmp(disppara,lcd_dts_timings[i]) == 0)
-            {
-                return i;
-            }
-        }
-        
-        printk("disp is parse error,disp setup default 1024x768\n");
-        return 3;
-    }
-}
-
-
 int rk_fb_prase_timing_dt(struct device_node *np, struct rk_screen *screen)
 {
 	struct display_timings *disp_timing;
@@ -555,14 +504,6 @@ int rk_fb_prase_timing_dt(struct device_node *np, struct rk_screen *screen)
 		pr_err("parse display timing err\n");
 		return -EINVAL;
 	}
-    /*
-    * according to the dispara
-    * set fb_buffer native-mode value  
-    * add by sampson
-    */
-    //disp_timing->native_mode = parse_disp(disppara);
-    //printk("%s(),disp_timing->native_mode is %d,the resolution is %s\n",\
-            //__func__,disp_timing->native_mode,lcd_dts_timings[disp_timing->native_mode]);
 	dt = display_timings_get(disp_timing, disp_timing->native_mode);
 	rk_fb_video_mode_from_timing(dt, screen);
 	return 0;
