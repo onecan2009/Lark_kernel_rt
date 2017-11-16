@@ -24,15 +24,156 @@
 #include <linux/slab.h>
 #include <linux/ctype.h>
 
+
 /* Protects all parameters, and incidentally kmalloced_param list. */
 static DEFINE_MUTEX(param_lock);
+//add
+char *user_pa=NULL;
+char *user_usb_pa=NULL;
+char *str_pa=NULL;
+char *s=NULL;
+char *user_usb_va = NULL;
+char *user_va= NULL;
+//add by samspon to fix disp
+char *disppara = NULL;
+EXPORT_SYMBOL( user_usb_va);
+EXPORT_SYMBOL( user_va);
+EXPORT_SYMBOL( s);
+EXPORT_SYMBOL(disppara);
 
+#if 0
+int myisxdigit (char x)
+{
+	if(x >'0' && x < '9')
+		return 1;
+	else if(x>'a' && x <'f')
+			return 1;
+	else if (x >'A' && x<'F')
+			return 1;
+	else
+			return 0;
+}
+
+int myisdigit (char x)
+{
+	if(x >'0' && x < '9')
+		return 1;
+	else
+		return 0;
+	}
+	
+unsigned long mysimple_strtoul(const char *cp, char **endp,
+				unsigned int base)
+{
+	unsigned long result = 0;
+	unsigned long value;
+
+	if (*cp == '0') {
+		cp++;
+		if ((*cp == 'x') && myisxdigit(cp[1])) {
+			base = 16;
+			cp++;
+		}
+
+		if (!base)
+			base = 8;
+	}
+
+	if (!base)
+		base = 10;
+
+	while (myisxdigit(*cp) && (value = myisdigit(*cp) ? *cp-'0' : *cp-'a'+10) < base) {
+		result = result*base + value;
+		cp++;
+	}
+
+	if (endp)
+		*endp = (char *)cp;
+
+	return result;
+}		
+void ubootstrtomac(unsigned int date,unsigned int swift_num,char *user_va,char *user_usb_va)
+{
+		unsigned int year=0;
+		unsigned int mon=0;
+		unsigned int day=0;
+		unsigned char mac[6]={0x00,0x90,0x4c,0x11,0x22,0x33};
+		unsigned char mac1[6]={0x10,0x90,0x4c,0x44,0x55,0x66};
+		
+	//	user_va=(char *)kmalloc(18,GFP_KERNEL);
+		//user_usb_va=(char *)kmalloc(18,GFP_KERNEL);
+		printk("user_va malloc  is %p,user_usb_va malloc is %p\n",user_va,user_usb_va);
+		int i=0;
+		year=date/10000;
+		mon=date%10000/100;
+		day=date%10000%100;
+			
+			if(year !=0 &&mon !=0 &&day !=0)
+			{
+			mac[3]=mon+12*(year-STARTDAT);
+			mac[4]=day;
+			mac[5]=swift_num;
+	
+			mac1[3]=mac[3];
+			mac1[4]=mac[4];
+			mac1[5]=mac[5];
+			}
+		char *mystr=NULL;
+		mystr=user_va;
+		for(i=0;i<5;i++)
+		{
+			sprintf(mystr,"%02x:",mac[i]);
+			mystr+=3;
+		}
+		sprintf(mystr,"%02x",mac[i]);
+
+		user_va[strlen(user_va)]='\0';
+
+		mystr=user_usb_va;
+		for(i=0;i<5;i++)
+		{
+			sprintf(mystr,"%02x:",mac1[i]);
+			mystr+=3;
+		}
+		sprintf(mystr,"%02x",mac1[i]);
+		user_usb_va[strlen(user_usb_va)]='\0';
+	printk("user_va after  is %s,user_usb_va after is %s\n",user_va,user_usb_va);
+	}
+	void strpar(char *s,char *user_usb_va,char *user_va)
+ {
+	 char s1[7][9]; // version cunstom_num	system_model product_date serial_num check_emp_num
+	int i=0,j=0,t=0;
+
+	unsigned int date=0;
+	unsigned int serial_num=0;
+		for(i=0;i<7;i++)
+	{
+		for(j=0;j<8;j++)
+		{
+			s1[i][j]=s[t++];
+		}
+			s1[i][j]='\0';
+	}
+	date=mysimple_strtoul(s1[3],NULL,16);
+	serial_num=mysimple_strtoul(s1[4],NULL,16);
+printk("date is %u serial_num is %u \n",date,serial_num);
+	ubootstrtomac(date,serial_num,user_va,user_usb_va);
+	printk("user_va is %s ,user_usb_va is %s\n",user_va,user_usb_va);
+	 
+	 }
+ 
+ /*add over*/
+#endif
 /* This just allows us to keep track of which parameters are kmalloced. */
 struct kmalloced_param {
 	struct list_head list;
 	char val[];
 };
 static LIST_HEAD(kmalloced_params);
+
+
+
+
 
 static void *kmalloc_parameter(unsigned int size)
 {
@@ -185,11 +326,9 @@ int parse_args(const char *doing,
 	       s16 max_level,
 	       int (*unknown)(char *param, char *val, const char *doing))
 {
+	//add array
 	char *param, *val;
-
-	/* Chew leading spaces */
 	args = skip_spaces(args);
-
 	if (*args)
 		pr_debug("doing %s, parsing ARGS: '%s'\n", doing, args);
 
@@ -198,6 +337,35 @@ int parse_args(const char *doing,
 		int irq_was_disabled;
 
 		args = next_arg(args, &param, &val);
+//add 
+	//printk("in while(),the args is %s,param is %s,val is %s \n",args,param,val);
+	//parse the ethaddr in cmdlines and return to user_pa,user_va
+/*
+	if(strcmp(param,"ethaddr")==0)
+	{
+			user_pa=param;
+			user_va=val;
+			//printk("user_pa is %s,user_va is %s\n",user_pa,user_va);
+	}
+	if(strcmp(param,"eth1addr")==0)
+	{
+			user_usb_pa=param;
+			user_usb_va=val;
+			//printk("user_usb_pa is %s,user_usb_va is %s\n",user_usb_pa,user_usb_va);
+	}
+	*/
+	
+	if(strcmp(param,"str")==0)
+	{
+			str_pa=param;
+			s=val;
+			printk("str_pa is %s,s is %s\n",str_pa,s);
+	}
+	if(strcmp(param,"disp")==0)
+	{
+			disppara=val;
+			printk("disppara=%s\n",disppara);
+	}
 		irq_was_disabled = irqs_disabled();
 		ret = parse_one(param, val, doing, params, num,
 				min_level, max_level, unknown);
@@ -220,8 +388,8 @@ int parse_args(const char *doing,
 			       doing, val ?: "", param);
 			return ret;
 		}
+		
 	}
-
 	/* All parsed OK. */
 	return 0;
 }

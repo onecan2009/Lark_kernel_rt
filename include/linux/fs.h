@@ -2470,7 +2470,7 @@ enum {
 };
 
 void dio_end_io(struct bio *bio, int error);
-
+void inode_dio_done(struct inode *inode);
 ssize_t __blockdev_direct_IO(int rw, struct kiocb *iocb, struct inode *inode,
 	struct block_device *bdev, const struct iovec *iov, loff_t offset,
 	unsigned long nr_segs, get_block_t get_block, dio_iodone_t end_io,

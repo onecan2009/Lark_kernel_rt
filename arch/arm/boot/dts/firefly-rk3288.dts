@@ -420,6 +420,7 @@
 
 &uart_gps {
         status = "okay";
+        current-speed = <460800>;
         dma-names = "!tx", "!rx";
         pinctrl-0 = <&uart3_xfer &uart3_cts>;
 };
@@ -568,7 +569,7 @@
 /*$_rbox_$_modify_$_end*/
 
 &fb {
-	rockchip,disp-mode = <ONE_DUAL>;
+	rockchip,disp-mode = <DUAL>;
     rockchip,uboot-logo-on= <1>;
 };
 

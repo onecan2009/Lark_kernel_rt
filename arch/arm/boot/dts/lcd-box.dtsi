@@ -32,22 +32,22 @@
                 };
 
 		disp_timings: display-timings {
-			native-mode = <&timing1>;
+			native-mode = <&timing3>;
 			timing0: timing0 {
 				screen-type = <SCREEN_RGB>;
 				out-face    = <OUT_P888>;
 				color-mode = <COLOR_YCBCR>;
 				clock-frequency = <74250000>;
-				hactive = <1280>;
-				vactive = <720>;
-				hback-porch = <220>;
-				hfront-porch = <110>;
-				vback-porch = <20>;
-				vfront-porch = <5>;
+				hactive = <1280>;               //水平分辨率
+				vactive = <720>;                //垂直分辨率
+				hback-porch = <220>;            //水平显示后肩
+				hfront-porch = <110>;           //水平显示前肩
+				vback-porch = <20>;             //垂直或者帧显示后肩
+				vfront-porch = <5>;             //垂直或者帧显示前肩
 				hsync-len = <40>;
 				vsync-len = <5>;
-				hsync-active = <1>;
-				vsync-active = <1>;
+				hsync-active = <1>;             //行同步
+				vsync-active = <1>;             //帧同步
 				de-active = <0>;
 				pixelclk-active = <0>;
 				swap-rb = <0>;
