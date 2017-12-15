@@ -127,8 +127,8 @@ struct mmc_data;
  * using barriers.
  */
 struct dw_mci {
-	spinlock_t		lock; /* Spinlock for control flow */
-	spinlock_t		slock; /* Spinlock for sdio int sync */
+	spinlock_t		lock;
+	spinlock_t		slock;
 	void __iomem		*regs;
 
 	struct scatterlist	*sg;
@@ -142,6 +142,7 @@ struct dw_mci {
 	unsigned int		prev_blksz;
 	unsigned char		timing;
 	struct workqueue_struct	*card_workqueue;
+	struct delayed_work	resume_rescan;
 
 	/* DMA interface members*/
 	int			use_dma;
@@ -152,7 +153,7 @@ struct dw_mci {
 	const struct dw_mci_dma_ops	*dma_ops;
 #ifdef CONFIG_MMC_DW_IDMAC
 	unsigned int		ring_size;
-	struct dw_mci_dma_slave *dms;
+        struct dw_mci_dma_slave *dms;
 	void                    *phy_regs;
 #else
 	struct dw_mci_dma_data	*dma_data;
@@ -180,14 +181,15 @@ struct dw_mci {
 	struct dw_mci_board	*pdata;
 	const struct dw_mci_drv_data	*drv_data;
 	void			*priv;
-	struct clk	*hpclk_mmc;
 	struct clk      *hclk_mmc;
 	struct clk      *clk_mmc;
 	struct dw_mci_slot	*slot[MAX_MCI_SLOTS];
 	struct mmc_host		*mmc;
 	struct mmc_command	*pre_cmd;
-	/* Fix the hold_reg value */
-	unsigned int    hold_reg_flag;
+        /* Fix the hold_reg value */
+        unsigned int    hold_reg_flag;
+        /* Timer for INT_DTO */
+        struct timer_list       dto_timer;
 	/* FIFO push and pull */
 	int			fifo_depth;
 	int			data_shift;
@@ -204,26 +206,15 @@ struct dw_mci {
 	/* Workaround flags */
 	u32			quirks;
 	bool	    irq_state;
-	u32                     svi_flags; /* Switch voltage interrupt flags */
+	u32                     svi_flags; /*switch voltage interrupt flags*/
 	struct regulator	*vmmc;	/* Power regulator */
 	unsigned long		irq_flags; /* IRQ flags */
 	int			irq;
-	u32         cmd_rto;     /* Cmd response timeout hold times */
-	struct pinctrl *pinctrl;
-
-	/* Pinctrl state */
-	struct pinctrl_state	*pins_default; /* Function port */
-	struct pinctrl_state	*pins_idle;    /* Gpio port */
-	struct pinctrl_state    *pins_udbg;    /* uart_dbg port */
-
-	u32	cid;
-	struct regmap	*grf;
-	u32 *regs_buffer;
-	const struct dw_mci_rst_ops *rst_ops;
-	u32	tune_regsbase;
-	u32	cru_regsbase;
-	u32	cru_reset_offset;
-	struct regmap *cru;
+	u32         cmd_rto;     /*cmd response timeout hold times*/
+	struct pinctrl *pinctrl; /*Pinctrl state*/
+	struct pinctrl_state	*pins_default;
+	struct pinctrl_state	*pins_idle;
+	struct pinctrl_state    *pins_sleep;
 };
 
 /* DMA ops for Internal/External DMAC interface */
@@ -235,12 +226,6 @@ struct dw_mci_dma_ops {
 	void (*stop)(struct dw_mci *host);
 	void (*cleanup)(struct dw_mci *host);
 	void (*exit)(struct dw_mci *host);
-};
-
-/* Platform rst hook for pm ops before suspend and after resume */
-struct dw_mci_rst_ops {
-	void (*pre_suspend)(struct dw_mci *host);
-	void (*post_resume)(struct dw_mci *host);
 };
 
 /* IP Quirks/flags. */
@@ -277,7 +262,7 @@ struct dw_mci_board {
 	u32 caps;	/* Capabilities */
 	u32 caps2;	/* More capabilities */
 	u32 pm_caps;	/* PM capabilities */
-	u32 cardtype_restrict;
+	u32 cardtype_restrict;	/*restrict the SDMMC controller to support card type;1--SD card; 2--sdio; 4--eMMC */
 	/*
 	 * Override fifo depth. If 0, autodetect it from the FIFOTH register,
 	 * but note that this may not be reliable after a bootloader has used
@@ -307,7 +292,7 @@ struct dw_mci_board {
 	struct block_settings *blk_settings;
 };
 #define grf_writel(v, offset)   do \
-{ writel_relaxed(v, RK_GRF_VIRT + offset); dsb(sy); } \
-while (0)
+        { writel_relaxed(v, RK_GRF_VIRT + offset); dsb(); } \
+                while (0)
 
 #endif /* LINUX_MMC_DW_MMC_H */

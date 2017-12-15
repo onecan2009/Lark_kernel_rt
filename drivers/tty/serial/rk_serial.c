@@ -249,6 +249,7 @@ struct of_rk_serial {
 	unsigned int id;
 	unsigned int use_dma;	
 	unsigned int uartclk;
+    unsigned int uartbaud;
 };
 #endif
 
@@ -1981,6 +1982,8 @@ static int of_rk_serial_parse_dt(struct device_node *np, struct of_rk_serial *rk
 	rks->id = of_alias_get_id(np, "serial");
 	if(!of_property_read_u32(np, "clock-frequency", &val))
 		rks->uartclk = val;
+    if(!of_property_read_u32(np, "current-speed", &val))
+        rks->uartbaud = val;
 
 #if USE_DMA
 	rks->use_dma = 0;

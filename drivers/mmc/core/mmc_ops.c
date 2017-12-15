@@ -395,21 +395,6 @@ int mmc_spi_set_crc(struct mmc_host *host, int use_crc)
 	return err;
 }
 
-int mmc_switch_status_error(struct mmc_host *host, u32 status)
-{
-	if (mmc_host_is_spi(host)) {
-		if (status & R1_SPI_ILLEGAL_COMMAND)
-			return -EBADMSG;
-	} else {
-		if (status & 0xFDFFA000)
-			pr_warn("%s: unexpected status %#x after switch\n",
-				mmc_hostname(host), status);
-		if (status & R1_SWITCH_ERROR)
-			return -EBADMSG;
-	}
-	return 0;
-}
-
 /**
  *	__mmc_switch - modify EXT_CSD register
  *	@card: the MMC card associated with the data transfer
@@ -426,7 +411,6 @@ int mmc_switch_status_error(struct mmc_host *host, u32 status)
 int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 		unsigned int timeout_ms, bool use_busy_signal, bool send_status)
 {
-	struct mmc_host *host = card->host;
 	int err;
 	struct mmc_command cmd = {0};
 	unsigned long timeout;
@@ -435,8 +419,6 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 
 	BUG_ON(!card);
 	BUG_ON(!card->host);
-
-	mmc_retune_hold(host);
 
 	cmd.opcode = MMC_SWITCH;
 	cmd.arg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
@@ -456,11 +438,11 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 
 	err = mmc_wait_for_cmd(card->host, &cmd, MMC_CMD_RETRIES);
 	if (err)
-		goto out;
+		return err;
 
 	/* No need to check card status in case of unblocking command */
 	if (!use_busy_signal)
-		goto out;
+		return 0;
 
 	/*
 	 * Must check status to be sure of no errors
@@ -476,7 +458,7 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 		if (send_status) {
 			err = __mmc_send_status(card, &status, ignore_crc);
 			if (err)
-				goto out;
+				return err;
 		}
 		if (card->host->caps & MMC_CAP_WAIT_WHILE_BUSY)
 			break;
@@ -490,22 +472,29 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 		 */
 		if (!send_status) {
 			mmc_delay(timeout_ms);
-			goto out;
+			return 0;
 		}
 
 		/* Timeout if the device never leaves the program state. */
 		if (time_after(jiffies, timeout)) {
 			pr_err("%s: Card stuck in programming state! %s\n",
 				mmc_hostname(card->host), __func__);
-			err = -ETIMEDOUT;
-			goto out;
+			return -ETIMEDOUT;
 		}
 	} while (R1_CURRENT_STATE(status) == R1_STATE_PRG);
 
-	err = mmc_switch_status_error(host, status);
-out:
-	mmc_retune_release(host);
-	return err;
+	if (mmc_host_is_spi(card->host)) {
+		if (status & R1_SPI_ILLEGAL_COMMAND)
+			return -EBADMSG;
+	} else {
+		if (status & 0xFDFFA000)
+			pr_warning("%s: unexpected status %#x after "
+			       "switch", mmc_hostname(card->host), status);
+		if (status & R1_SWITCH_ERROR)
+			return -EBADMSG;
+	}
+
+	return 0;
 }
 EXPORT_SYMBOL_GPL(__mmc_switch);
 

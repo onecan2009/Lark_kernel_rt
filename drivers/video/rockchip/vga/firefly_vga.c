@@ -15,7 +15,7 @@
 #define DDC_I2C_RATE		50*1000
 #define EDID_LENGTH 128
 
-#define DEFAULT_MODE      10
+#define DEFAULT_MODE      3
 
 extern char *disppara;
 extern  struct fb_videomode sda7123_vga_mode[];
