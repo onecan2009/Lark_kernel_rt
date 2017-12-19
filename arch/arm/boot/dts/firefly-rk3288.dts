@@ -211,10 +211,6 @@
 	rx_delay = <0x20>;
 };
 
-&uart_dbg {
-	 status = "okay";
-};
-
 &pinctrl {
 	//used for init some gpio
 	
@@ -410,12 +406,14 @@
 
 &uart_bt {
         status = "okay";
+        current-speed = <115200>;
         dma-names = "!tx", "!rx";
         pinctrl-0 = <&uart0_xfer &uart0_cts>;
 };
 
 &uart_dbg {
 	status = "okay";
+    current-speed = <115200>;
 };
 
 &uart_gps {

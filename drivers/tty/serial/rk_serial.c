@@ -178,7 +178,7 @@ static void dbg(const char *fmt, ...)
 }
 
 //enable log output
-#define DEBUG 0
+#define DEBUG 1
 static int log_port = -1;
 module_param(log_port, int, S_IRUGO|S_IWUSR);
 
@@ -359,11 +359,12 @@ static int serial_dl_write(struct uart_rk_port *up, unsigned int value)
 		if (--tmout == 0){
 			if(up->port.line != DBG_PORT)
 				dbg("set serial.%d baudrate timeout\n", up->port.line);
+                printk("set serial.%d baudrate timeout\n", up->port.line);
 			return -1;
 		}
 		udelay(1);
 	}
-
+    printk("UART_DLL:0x%x,UART_DLM:0x%x\n",UART_DLL,UART_DLM);
 	serial_out(up, UART_DLL, value & 0xff);
 	serial_out(up, UART_DLM, value >> 8 & 0xff);
 
@@ -1425,8 +1426,17 @@ serial_rk_set_termios(struct uart_port *port, struct ktermios *termios,
 	baud = uart_get_baud_rate(port, termios, old,
 				  port->uartclk / 16 / 0xffff,
 				  port->uartclk / 16);
-
 	quot = uart_get_divisor(port, baud);
+    printk("in %s(),baud:%d,quot:%d\n",__func__,baud,quot);
+    printk("in %s(),port->irq:%d,port->iobase:%p\n",__func__,port->irq,port->iobase);
+    
+    if(0 && port->iobase == 0xff1b0000)  //强制将ttyS3的波特率写成460800
+    {
+        printk("force set baud in %s()....\n",__func__);
+        WARN_ON(1);
+        baud = 460800;                  //波特率
+        quot = 3;                       //分频系数
+    }
 	//dev_info(up->port.dev, "uartclk:%d\n", port->uartclk/16);
 	//dev_info(up->port.dev, "baud:%d\n", baud);
 	//dev_info(up->port.dev, "quot:%d\n", quot);
@@ -1984,7 +1994,7 @@ static int of_rk_serial_parse_dt(struct device_node *np, struct of_rk_serial *rk
 		rks->uartclk = val;
     if(!of_property_read_u32(np, "current-speed", &val))
         rks->uartbaud = val;
-
+    printk("rks->uartclk :%u,rks->uartbaud:%u\n",rks->uartclk,rks->uartbaud);
 #if USE_DMA
 	rks->use_dma = 0;
 	for(i = 0; i < 2; i++) {
@@ -2028,7 +2038,7 @@ static int serial_rk_probe(struct platform_device *pdev)
 	of_rk_serial_parse_dt(pdev->dev.of_node, &rks);
 	pdev->id = rks.id;
 #endif
-
+    printk("rks.uartbaud:%u\n",rks.uartbaud);
 	sprintf(up->name, "rk29_serial.%d", pdev->id);
 	up->pdev = pdev;
 #ifdef CONFIG_CLOCK_CTRL
@@ -2064,6 +2074,7 @@ static int serial_rk_probe(struct platform_device *pdev)
 	up->port.iobase = mem->start;
 	up->port.mapbase = mem->start;
 	up->port.irqflags = IRQF_DISABLED;
+    up->port.baud = rks.uartbaud;
 #if defined(CONFIG_CLOCK_CTRL)
 	up->port.uartclk = clk_get_rate(up->clk);
 #elif defined(CONFIG_OF)

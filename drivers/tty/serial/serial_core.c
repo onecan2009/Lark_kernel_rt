@@ -345,7 +345,7 @@ uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
 	unsigned int try, baud, altbaud = 38400;
 	int hung_up = 0;
 	upf_t flags = port->flags & UPF_SPD_MASK;
-
+    
 	if (flags == UPF_SPD_HI)
 		altbaud = 57600;
 	else if (flags == UPF_SPD_VHI)
@@ -370,11 +370,13 @@ uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
 		 */
 		if (baud == 0) {
 			hung_up = 1;
-			baud = 9600;
+			baud = 115200*4;;
 		}
 
 		if (baud >= min && baud <= max)
-			return baud;
+            return baud;
+        
+			
 
 		/*
 		 * Oops, the quotient was zero.  Try again with
@@ -451,7 +453,7 @@ static void uart_change_speed(struct tty_struct *tty, struct uart_state *state,
 		return;
 
 	termios = &tty->termios;
-
+    //printk("in %s(),termios->ispeed:%u,termios->ospeed:%u\n",__func__,termios->ispeed,termios->ospeed);
 	/*
 	 * Set flags based on termios cflag
 	 */
@@ -2328,8 +2330,10 @@ int uart_register_driver(struct uart_driver *drv)
 	normal->type		= TTY_DRIVER_TYPE_SERIAL;
 	normal->subtype		= SERIAL_TYPE_NORMAL;
 	normal->init_termios	= tty_std_termios;
-	normal->init_termios.c_cflag = B9600 | CS8 | CREAD | HUPCL | CLOCAL;
-	normal->init_termios.c_ispeed = normal->init_termios.c_ospeed = 9600;
+	//normal->init_termios.c_cflag = B9600 | CS8 | CREAD | HUPCL | CLOCAL;
+	//normal->init_termios.c_ispeed = normal->init_termios.c_ospeed = 9600;
+	normal->init_termios.c_cflag = B460800 | CS8 | CREAD | HUPCL | CLOCAL;
+	normal->init_termios.c_ispeed = normal->init_termios.c_ospeed = 460800;
 	normal->flags		= TTY_DRIVER_REAL_RAW | TTY_DRIVER_DYNAMIC_DEV;
 	normal->driver_state    = drv;
 	tty_set_operations(normal, &uart_ops);
