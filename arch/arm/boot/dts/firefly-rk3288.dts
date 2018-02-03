@@ -572,7 +572,7 @@
 };
 
 &disp_timings {
-	native-mode = <&timing3>;
+	native-mode = <&timing2>;
 };
 
 &rk_screen {
@@ -583,7 +583,7 @@
 &lcdc0 {
 	status = "okay";
 	rockchip,prop = <PRMRY>;
-	/*
+    /*
 		power_ctr: power_ctr {
         lcd_en:lcd_en {
                 rockchip,power_type = <GPIO>;
@@ -591,8 +591,7 @@
                 rockchip,delay = <10>;
         };
     };
-	*/
-
+    */
 };
 
 &lcdc1 {
@@ -601,14 +600,15 @@
 };
 
 &hdmi {
-	status = "okay";
+	//status = "okay";
+    status = "disabled";
 	rockchips,hdmi_audio_source = <0>;
 	hdmi_cec = <0>;
 };
 
 &adc {
-	status = "okay";
-
+	//status = "okay";
+    status = "disabled";
 	key {
 		compatible = "rockchip,key";
 		

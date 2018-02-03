@@ -81,5 +81,41 @@ config LOGO_M32R_CLUT224
 	bool "224-color M32R Linux logo"
 	depends on M32R
 	default y
+    
+config LOGO_CCW_LINUX_CLUT224
+	bool "Standard 224-color ccw Linux logo"
+	default y
+
+config LOGO_1280_CCW_LINUX_CLUT224
+	bool "Standard 224-color 1280 ccw Linux logo"
+	default y
+
+config LOGO_1280_LINUX_CLUT224
+	bool "Standard 224-color 1280 Linux logo"
+	default y
+    
+config LOGO_1366_CCW_LINUX_CLUT224
+	bool "Standard 224-color 1366 ccw Linux logo"
+	default y
+    
+config LOGO_1366_LINUX_CLUT224
+	bool "Standard 224-color 1366 Linux logo"
+	default y
+
+config LOGO_1440_CCW_LINUX_CLUT224
+	bool "Standard 224-color 1440 ccw Linux logo"
+	default y
+
+config LOGO_1440_LINUX_CLUT224
+	bool "Standard 224-color 1440 Linux logo"
+	default y
+   
+config LOGO_1920_CCW_LINUX_CLUT224
+	bool "Standard 224-color 1920 ccw Linux logo"
+	default y
+
+config LOGO_1920_LINUX_CLUT224
+	bool "Standard 224-color 1920 Linux logo"
+	default y 
 
 endif # LOGO

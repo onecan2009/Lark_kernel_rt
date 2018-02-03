@@ -34,13 +34,75 @@ char *str_pa=NULL;
 char *s=NULL;
 char *user_usb_va = NULL;
 char *user_va= NULL;
+int bRotate = 0;
 //add by samspon to fix disp
-char *disppara = NULL;
+char dispbuf[64] = {0};
+char *disppara = dispbuf;
 EXPORT_SYMBOL( user_usb_va);
 EXPORT_SYMBOL( user_va);
 EXPORT_SYMBOL( s);
 EXPORT_SYMBOL(disppara);
+EXPORT_SYMBOL(bRotate);
 
+unsigned long strtol(const char *cp, char **endp,
+				unsigned int base)
+{
+	unsigned long result = 0;
+	unsigned long value;
+
+	if (*cp == '0') {
+		cp++;
+		if ((*cp == 'x') && isxdigit(cp[1])) {
+			base = 16;
+			cp++;
+		}
+
+		if (!base)
+			base = 8;
+	}
+
+	if (!base)
+		base = 10;
+
+	while (isxdigit(*cp) && (value = isdigit(*cp) ? *cp-'0' : (islower(*cp)
+	    ? toupper(*cp) : *cp)-'A'+10) < base) {
+		result = result*base + value;
+		cp++;
+	}
+
+	if (endp){
+		*endp = (char *)cp;
+		//printf("endp is %p,*endp is %c\n",*endp,**endp);
+	}
+	return result;
+}
+                
+int setDisp(char * tempdisp)
+{   
+    char buf[128] = {0};
+    char *p = NULL;
+    char *pp = NULL;
+    int displen = 0;
+    
+   // printk("in %s()\n",__FUNCTION__);
+    if(!tempdisp)
+    {
+        printk("disp pointer NULL\n");
+        return -1;
+    }
+    
+    pp = buf;
+    memcpy(buf,tempdisp,strlen(tempdisp));
+    p = strstr(buf,"R");
+    bRotate = strtol(p+1,NULL,10);
+    displen = p-pp;
+    
+    memcpy(disppara,buf,displen);
+    disppara[displen] = '\0';
+    //printk("disppara is %s\nbRotate is %d\n",disppara,bRotate);
+    
+    return 0;
+}
 #if 0
 int myisxdigit (char x)
 {
@@ -102,7 +164,7 @@ void ubootstrtomac(unsigned int date,unsigned int swift_num,char *user_va,char *
 		
 	//	user_va=(char *)kmalloc(18,GFP_KERNEL);
 		//user_usb_va=(char *)kmalloc(18,GFP_KERNEL);
-		printk("user_va malloc  is %p,user_usb_va malloc is %p\n",user_va,user_usb_va);
+		//printk("user_va malloc  is %p,user_usb_va malloc is %p\n",user_va,user_usb_va);
 		int i=0;
 		year=date/10000;
 		mon=date%10000/100;
@@ -137,7 +199,7 @@ void ubootstrtomac(unsigned int date,unsigned int swift_num,char *user_va,char *
 		}
 		sprintf(mystr,"%02x",mac1[i]);
 		user_usb_va[strlen(user_usb_va)]='\0';
-	printk("user_va after  is %s,user_usb_va after is %s\n",user_va,user_usb_va);
+	//printk("user_va after  is %s,user_usb_va after is %s\n",user_va,user_usb_va);
 	}
 	void strpar(char *s,char *user_usb_va,char *user_va)
  {
@@ -156,9 +218,9 @@ void ubootstrtomac(unsigned int date,unsigned int swift_num,char *user_va,char *
 	}
 	date=mysimple_strtoul(s1[3],NULL,16);
 	serial_num=mysimple_strtoul(s1[4],NULL,16);
-printk("date is %u serial_num is %u \n",date,serial_num);
+//printk("date is %u serial_num is %u \n",date,serial_num);
 	ubootstrtomac(date,serial_num,user_va,user_usb_va);
-	printk("user_va is %s ,user_usb_va is %s\n",user_va,user_usb_va);
+	//printk("user_va is %s ,user_usb_va is %s\n",user_va,user_usb_va);
 	 
 	 }
  
@@ -328,6 +390,7 @@ int parse_args(const char *doing,
 {
 	//add array
 	char *param, *val;
+    char *tempdisp = NULL;
 	args = skip_spaces(args);
 	if (*args)
 		pr_debug("doing %s, parsing ARGS: '%s'\n", doing, args);
@@ -357,14 +420,16 @@ int parse_args(const char *doing,
 	
 	if(strcmp(param,"str")==0)
 	{
-			str_pa=param;
-			s=val;
-			printk("str_pa is %s,s is %s\n",str_pa,s);
+        str_pa=param;
+		s=val;
+		//printk("str_pa is %s,s is %s\n",str_pa,s);
 	}
 	if(strcmp(param,"disp")==0)
 	{
-			disppara=val;
-			printk("disppara=%s\n",disppara);
+        tempdisp = val;
+        setDisp(tempdisp);
+        //printk("disppara=%s\n",disppara);
+        //printk("bRotate=%d\n",bRotate);
 	}
 		irq_was_disabled = irqs_disabled();
 		ret = parse_one(param, val, doing, params, num,

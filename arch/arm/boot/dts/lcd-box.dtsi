@@ -32,8 +32,70 @@
                 };
 
 		disp_timings: display-timings {
-			native-mode = <&timing3>;
-			timing0: timing0 {
+			native-mode = <&timing2>;
+            timing0: timing0 {
+                screen-type = <SCREEN_RGB>;
+                out-face    = <OUT_P888>;
+                color-mode = <COLOR_YCBCR>;
+                clock-frequency = <25000000>;
+                hactive = <640>;               //水平分辨率
+                vactive = <480>;                //垂直分辨率
+                hback-porch = <48>;            //水平显示后肩
+                hfront-porch = <16>;           //水平显示前肩
+                vback-porch = <33>;             //垂直或者帧显示后肩
+                vfront-porch = <10>;             //垂直或者帧显示前肩
+                hsync-len = <96>;
+                vsync-len = <2>;
+                hsync-active = <0>;             //行同步
+                vsync-active = <0>;             //帧同步
+                de-active = <0>;
+                pixelclk-active = <0>;
+                swap-rb = <0>;
+                swap-rg = <0>;
+                swap-gb = <0>;
+            };
+            timing1: timing1 {
+				screen-type = <SCREEN_RGB>;
+				out-face    = <OUT_P888>;
+				color-mode = <COLOR_YCBCR>;
+				clock-frequency = <40000000>;
+				hactive = <800>;               //水平分辨率
+				vactive = <600>;                //垂直分辨率
+				hback-porch = <88>;            //水平显示后肩
+				hfront-porch = <40>;           //水平显示前肩
+				vback-porch = <23>;             //垂直或者帧显示后肩
+				vfront-porch = <1>;             //垂直或者帧显示前肩
+				hsync-len = <128>;
+				vsync-len = <4>;
+				hsync-active = <0>;             //行同步
+				vsync-active = <0>;             //帧同步
+				de-active = <0>;
+				pixelclk-active = <0>;
+				swap-rb = <0>;
+				swap-rg = <0>;
+				swap-gb = <0>;
+            };
+            timing2: timing2 {
+				screen-type = <SCREEN_RGB>;
+				out-face    = <OUT_P888>;
+				clock-frequency = <65000000>;
+				hactive = <1024>;
+				vactive = <768>;
+				hback-porch = <160>;
+				hfront-porch = <24>;
+				vback-porch = <29>;
+				vfront-porch = <3>;
+				hsync-len = <136>;
+				vsync-len = <6>;
+				hsync-active = <1>;
+				vsync-active = <1>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+				swap-rb = <0>;
+				swap-rg = <0>;
+				swap-gb = <0>;
+			};
+            timing3: timing3 {
 				screen-type = <SCREEN_RGB>;
 				out-face    = <OUT_P888>;
 				color-mode = <COLOR_YCBCR>;
@@ -54,79 +116,38 @@
 				swap-rg = <0>;
 				swap-gb = <0>;
                 };
-            timing1: timing1 {
+            timing4: timing4 {
 				screen-type = <SCREEN_RGB>;
 				out-face    = <OUT_P888>;
 				color-mode = <COLOR_YCBCR>;
-				clock-frequency = <148500000>;
-				hactive = <1920>;
-				vactive = <1080>;
-				hback-porch = <148>;
-				hfront-porch = <88>;
-				vback-porch = <36>;
-				vfront-porch = <4>;
-				hsync-len = <44>;
-				vsync-len = <5>;
-				hsync-active = <1>;
-				vsync-active = <1>;
+				clock-frequency = <108000000>;
+				hactive = <1280>;               //水平分辨率
+				vactive = <1024>;                //垂直分辨率
+				hback-porch = <248>;            //水平显示后肩
+				hfront-porch = <48>;           //水平显示前肩
+				vback-porch = <38>;             //垂直或者帧显示后肩
+				vfront-porch = <1>;             //垂直或者帧显示前肩
+				hsync-len = <112>;
+				vsync-len = <3>;
+				hsync-active = <1>;             //行同步
+				vsync-active = <1>;             //帧同步
 				de-active = <0>;
 				pixelclk-active = <0>;
 				swap-rb = <0>;
 				swap-rg = <0>;
 				swap-gb = <0>;
                 };
-            timing2: timing2 {
+			timing5: timing5 {
 				screen-type = <SCREEN_RGB>;
 				out-face    = <OUT_P888>;
-				color-mode = <COLOR_YCBCR>;
-				clock-frequency = <297000000>;
-				hactive = <3840>;
-				vactive = <2160>;
-				hback-porch = <296>;
-				hfront-porch = <176>;
-				vback-porch = <72>;
-				vfront-porch = <8>;
-				hsync-len = <88>;
-				vsync-len = <10>;
-				hsync-active = <1>;
-				vsync-active = <1>;
-				de-active = <0>;
-				pixelclk-active = <0>;
-				swap-rb = <0>;
-				swap-rg = <0>;
-				swap-gb = <0>;
-                };
-            timing3: timing3 {
-				screen-type = <SCREEN_RGB>;
-				out-face    = <OUT_P888>;
-				clock-frequency = <65000000>;
-				hactive = <1024>;
-				vactive = <768>;
-				hback-porch = <160>;
-				hfront-porch = <24>;
-				vback-porch = <29>;
-				vfront-porch = <3>;
-				hsync-len = <136>;
-				vsync-len = <6>;
-				hsync-active = <1>;
-				vsync-active = <1>;
-				de-active = <0>;
-				pixelclk-active = <0>;
-				swap-rb = <0>;
-				swap-rg = <0>;
-				swap-gb = <0>;
-			};
-			timing4: timing4 {
-				screen-type = <SCREEN_RGB>;
-				out-face    = <OUT_P888>;
-				clock-frequency = <65000000>;
+				clock-frequency = <85500000>;
 				hactive = <1366>;
 				vactive = <768>;
-				hback-porch = <64>;
-				hfront-porch = <14>;
-				vback-porch = <28>;
-				vfront-porch = <1>;
-				hsync-len = <56>;
+				hback-porch = <213>;
+				hfront-porch = <70>;
+				vback-porch = <24>;
+				vfront-porch = <3>;
+				hsync-len = <143>;
 				vsync-len = <3>;
 				hsync-active = <1>;
 				vsync-active = <1>;
@@ -136,7 +157,7 @@
 				swap-rg = <0>;
 				swap-gb = <0>;
 			};
-			timing5: timing5 {
+			timing6: timing6 {
 				screen-type = <SCREEN_RGB>;
 				out-face    = <OUT_P888>;
 				clock-frequency = <106500000>;
@@ -156,5 +177,89 @@
 				swap-rg = <0>;
 				swap-gb = <0>;
 			};
+            timing7: timing7 {
+				screen-type = <SCREEN_RGB>;
+				out-face    = <OUT_P888>;
+				color-mode = <COLOR_YCBCR>;
+				clock-frequency = <108000000>;
+				hactive = <1600>;               //水平分辨率
+				vactive = <900>;                //垂直分辨率
+				hback-porch = <96>;            //水平显示后肩
+				hfront-porch = <24>;           //水平显示前肩
+				vback-porch = <96>;             //垂直或者帧显示后肩
+				vfront-porch = <1>;             //垂直或者帧显示前肩
+				hsync-len = <80>;
+				vsync-len = <3>;
+				hsync-active = <1>;             //行同步
+				vsync-active = <1>;             //帧同步
+				de-active = <0>;
+				pixelclk-active = <0>;
+				swap-rb = <0>;
+				swap-rg = <0>;
+				swap-gb = <0>;
+            };
+            timing8: timing8 {
+				screen-type = <SCREEN_RGB>;
+				out-face    = <OUT_P888>;
+				color-mode = <COLOR_YCBCR>;
+				clock-frequency = <146200000>;
+				hactive = <1680>;               //水平分辨率
+				vactive = <1050>;                //垂直分辨率
+				hback-porch = <280>;            //水平显示后肩
+				hfront-porch = <104>;           //水平显示前肩
+				vback-porch = <30>;             //垂直或者帧显示后肩
+				vfront-porch = <3>;             //垂直或者帧显示前肩
+				hsync-len = <176>;
+				vsync-len = <6>;
+				hsync-active = <0>;             //行同步
+				vsync-active = <1>;             //帧同步
+				de-active = <0>;
+				pixelclk-active = <0>;
+				swap-rb = <0>;
+				swap-rg = <0>;
+				swap-gb = <0>;
+            };
+            timing9: timing9 {
+				screen-type = <SCREEN_RGB>;
+				out-face    = <OUT_P888>;
+				color-mode = <COLOR_YCBCR>;
+				clock-frequency = <148500000>;
+				hactive = <1920>;
+				vactive = <1080>;
+				hback-porch = <148>;
+				hfront-porch = <88>;
+				vback-porch = <36>;
+				vfront-porch = <4>;
+				hsync-len = <44>;
+				vsync-len = <5>;
+				hsync-active = <1>;
+				vsync-active = <1>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+				swap-rb = <0>;
+				swap-rg = <0>;
+				swap-gb = <0>;
+            };
+            timing10: timing10 {
+				screen-type = <SCREEN_RGB>;
+				out-face    = <OUT_P888>;
+				color-mode = <COLOR_YCBCR>;
+				clock-frequency = <297000000>;
+				hactive = <3840>;
+				vactive = <2160>;
+				hback-porch = <296>;
+				hfront-porch = <176>;
+				vback-porch = <72>;
+				vfront-porch = <8>;
+				hsync-len = <88>;
+				vsync-len = <10>;
+				hsync-active = <1>;
+				vsync-active = <1>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+				swap-rb = <0>;
+				swap-rg = <0>;
+				swap-gb = <0>;
+            };
         };
 };

@@ -15,6 +15,17 @@ obj-$(CONFIG_LOGO_SUPERH_MONO)		+= logo_superh_mono.o
 obj-$(CONFIG_LOGO_SUPERH_VGA16)		+= logo_superh_vga16.o
 obj-$(CONFIG_LOGO_SUPERH_CLUT224)	+= logo_superh_clut224.o
 obj-$(CONFIG_LOGO_M32R_CLUT224)		+= logo_m32r_clut224.o
+obj-$(CONFIG_LOGO_CCW_LINUX_CLUT224)+= logo_ccw_linux_clut224.o
+obj-$(CONFIG_LOGO_1366_CCW_LINUX_CLUT224)+= logo_1366_ccw_linux_clut224.o
+obj-$(CONFIG_LOGO_1366_LINUX_CLUT224)+= logo_1366_linux_clut224.o
+obj-$(CONFIG_LOGO_1280_CCW_LINUX_CLUT224)+= logo_1280_ccw_linux_clut224.o
+obj-$(CONFIG_LOGO_1280_LINUX_CLUT224)+= logo_1280_linux_clut224.o
+obj-$(CONFIG_LOGO_1440_CCW_LINUX_CLUT224)+= logo_1440_ccw_linux_clut224.o
+obj-$(CONFIG_LOGO_1440_LINUX_CLUT224)+= logo_1440_linux_clut224.o
+obj-$(CONFIG_LOGO_1920_CCW_LINUX_CLUT224)+= logo_1920_ccw_linux_clut224.o
+obj-$(CONFIG_LOGO_1920_LINUX_CLUT224)+= logo_1920_linux_clut224.o
+obj-$(CONFIG_SPU_BASE)			+= logo_spe_clut224.o
+
 
 obj-$(CONFIG_SPU_BASE)			+= logo_spe_clut224.o
 

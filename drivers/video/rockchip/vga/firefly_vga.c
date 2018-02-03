@@ -297,47 +297,48 @@ static struct fb_videomode *vga_find_best_mode(void)
 	return best;
 }
 
+// add oc ////////////////////////////////////////////////////////////////
 
-/*
- *  Get the resolution by passing the parameters
- *  @sampson
- */
+static char* dts_timings[] = {
+    "640x480",
+    "800x600",
+    "1024x768",
+    "1280x720",
+    "1280x1024",
+    "1366x768",
+    "1440x900",
+    "1600x900",
+    "1680x1050",
+    "1920x1080"
+    };
 
-static int default_mode(char *disp)
+int disp_vga_parameter(void)
 {
-    printk("%s() disp is %s\n",__func__,disp);
-    if(disp == NULL)
+	int i = 0, mode_num = DEFAULT_MODE;
+    
+    for(i = 0; i < sizeof(dts_timings)/sizeof(dts_timings[0]); i++)
     {
+        if(strcmp(disppara,dts_timings[i]) == 0)
+        {	
+           mode_num = i + 1;
+           break;
+        }
+    }
+    if (i == sizeof(dts_timings)/sizeof(dts_timings[0]))
+    {
+        printk("%s(), set default resolution[%s]]\n",__func__,dts_timings[DEFAULT_MODE]);
         return DEFAULT_MODE;
     }
-    else
-    {
-        if(strcmp(disp,"1280x720") == 0)
-        {
-            return 4;
-        }
-        else if(strcmp(disp,"1920x1080") == 0)
-        {
-            return 10;
-        }
-        else if(strcmp(disp,"3840x2160") == 0)
-        {
-            return 3;
-        }
-        else if(strcmp(disp,"1024x768") == 0)
-        {
-            return 3;
-        }
-        else if(strcmp(disp,"1366x768") == 0)
-        {
-            return 6;
-        }
-        else if(strcmp(disp,"1440x900") == 0)
-        {
-            return 7;
-        }
-    }
+   
+    printk("%s(), VGA is %d:[%s]\n",__func__,mode_num,dts_timings[i]);
+    
+	return mode_num;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////
+
 
 int vga_switch_default_screen(void)
 {
@@ -352,7 +353,7 @@ int vga_switch_default_screen(void)
 	}
     //at first, get the default resolution
     //mode_num = default_mode(disppara);
-	printk("%s(),mode_num is %d\n",__func__,mode_num);
+	printk("%s(),default mode_num is %d\n",__func__,mode_num);
     mode = vga_find_best_mode();
 	if (mode) {
 		printk("vga-ddc: best mode %dx%d@%d[pixclock-%ld KHZ]\n", mode->xres, mode->yres,
@@ -366,7 +367,11 @@ int vga_switch_default_screen(void)
 		    }
 	    }
 	}
-
+    printk("%s(),fixed mode_num is %d\n",__func__,mode_num);
+    //printk("%s(),dts_best_mode is %d\n",__func__,dts_best_mode());
+    printk("fix resolution ...\n");
+    mode_num = disp_vga_parameter();
+    
 	return mode_num;
 }
 
@@ -921,6 +926,7 @@ static void __exit vga_edid_exit(void)
 
 
 late_initcall(vga_edid_init);
+//fs_initcall(vga_edid_init);
 module_exit(vga_edid_exit);
 
 MODULE_AUTHOR("teefirefly@gmail.com");

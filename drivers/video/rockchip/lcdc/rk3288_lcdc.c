@@ -278,7 +278,9 @@ int rk3288_lcdc_direct_set_win_addr
 	
 	return 0;
 }
-
+//黑屏的数据区，这是一种能把自己蠢哭的做法
+// 但是直接清数据会handle内核
+static unsigned char blankbuf[1920*1080] = {0x0};
 static void lcdc_read_reg_defalut_cfg(struct lcdc_device *lcdc_dev)
 {
 	int reg = 0;
@@ -288,10 +290,22 @@ static void lcdc_read_reg_defalut_cfg(struct lcdc_device *lcdc_dev)
 	u32 v_pw_bp = screen->mode.vsync_len + screen->mode.upper_margin;
 	u32 st_x, st_y;
 	struct rk_lcdc_win *win0 = lcdc_dev->driver.win[0];
-
+    
 	spin_lock(&lcdc_dev->reg_lock);
+   
 	memcpy(lcdc_dev->regsbak, lcdc_dev->regs, FRC_LOWER11_1);
-	for (reg = 0; reg < FRC_LOWER11_1; reg += 4) {
+    
+    // 将寄存器的数据区起始地址写如黑屏的数据
+    //lcdc_writel(lcdc_dev,WIN0_YRGB_MST,(u32)&blankbuf[0]);
+    //lcdc_writel(lcdc_dev,WIN1_YRGB_MST,(u32)&blankbuf[0]);
+    //val = lcdc_readl(lcdc_dev, WIN0_YRGB_MST);
+    //printk("val of WIN0_YRGB_MST is 0x%x\n",val);
+    //val = lcdc_readl(lcdc_dev, WIN1_YRGB_MST);
+    //printk("val of WIN1_YRGB_MST is 0x%x\n",val);
+    
+    
+    //lcdc_writel(lcdc_dev,DSP_BG,m_DSP_BG_RED);
+    for (reg = 0; reg < FRC_LOWER11_1; reg += 4) {
 		val = lcdc_readl(lcdc_dev, reg);
 		switch (reg) {
 			case WIN0_ACT_INFO:
@@ -347,6 +361,11 @@ static void lcdc_read_reg_defalut_cfg(struct lcdc_device *lcdc_dev)
 				break;
 		}
 	}
+    printk("h_pw_bp :%u,v_pw_bp :%u\n",h_pw_bp,v_pw_bp);
+    printk("xsize :%u,ysize :%u\n",win0->area[0].xsize,win0->area[0].ysize);
+    printk("win0->area[0].smem_start :%x\n",win0->area[0].smem_start);
+    printk("win0->area[0].cbr_start :%x\n",win0->area[0].cbr_start);
+    
 	spin_unlock(&lcdc_dev->reg_lock);
 	
 }
@@ -373,7 +392,7 @@ static int rk3288_lcdc_pre_init(struct rk_lcdc_driver *dev_drv)
 		dev_err(lcdc_dev->dev, "failed to get lcdc%d clk source\n",
 			lcdc_dev->id);
 	}
-	if (!support_uboot_display())   
+	if (support_uboot_display())   
 		rk_disp_pwr_enable(dev_drv);	
     rk3288_lcdc_clk_enable(lcdc_dev);
 
@@ -410,8 +429,12 @@ static int rk3288_lcdc_pre_init(struct rk_lcdc_driver *dev_drv)
 	/*disable win0 to workaround iommu pagefault */
 	/*if (dev_drv->iommu_enabled) */
 	/*      win0_enable(lcdc_dev, 0); */
+    
+    //lcdc_writel(lcdc_dev,BCSH_BCS,0xd0010000);
+	//lcdc_writel(lcdc_dev,BCSH_H,0x01000000);
+	//lcdc_writel(lcdc_dev,BCSH_COLOR_BAR,0x1);
+    
 	lcdc_dev->pre_init = true;
-
 
 	return 0;
 }
@@ -1027,8 +1050,15 @@ static int rk3288_lcdc_reg_update(struct rk_lcdc_driver *dev_drv)
 }
 
 static int rk3288_lcdc_reg_restore(struct lcdc_device *lcdc_dev)
-{
-	memcpy((u8 *) lcdc_dev->regs, (u8 *) lcdc_dev->regsbak, 0x1fc);
+{   
+    printk("lcdc_dev->driver.iommu_enabled:%d\n",lcdc_dev->driver.iommu_enabled);
+    
+    if (lcdc_dev->driver.iommu_enabled)
+		memcpy((u8 *) lcdc_dev->regs, (u8 *) lcdc_dev->regsbak, 0x330);
+	else
+		memcpy((u8 *) lcdc_dev->regs, (u8 *) lcdc_dev->regsbak, 0x1fc);
+    
+	//memcpy((u8 *) lcdc_dev->regs, (u8 *) lcdc_dev->regsbak, 0x1fc);
 	return 0;
 }
 static int rk3288_lcdc_mmu_en(struct rk_lcdc_driver *dev_drv)
@@ -1462,11 +1492,11 @@ static int rk3288_lcdc_open(struct rk_lcdc_driver *dev_drv, int win_id,
 		rk3288_lcdc_pre_init(dev_drv);
 		rk3288_lcdc_clk_enable(lcdc_dev);
 		rk3288_lcdc_enable_irq(dev_drv);
+        //printk("%s(),dev_drv->iommu_enabled is %d\n",__func__,dev_drv->iommu_enabled);
 #if defined(CONFIG_ROCKCHIP_IOMMU)
 		if (dev_drv->iommu_enabled) {
 			if (!dev_drv->mmu_dev) {
-				dev_drv->mmu_dev =
-                                        rk_fb_get_sysmmu_device_by_compatible(dev_drv->mmu_dts_name);
+				dev_drv->mmu_dev = rk_fb_get_sysmmu_device_by_compatible(dev_drv->mmu_dts_name);
 				if (dev_drv->mmu_dev) {
 					rk_fb_platform_set_sysmmu(dev_drv->mmu_dev,
 					                          dev_drv->dev);
@@ -1478,7 +1508,7 @@ static int rk3288_lcdc_open(struct rk_lcdc_driver *dev_drv, int win_id,
 			}
 		}
 #endif
-		rk3288_lcdc_reg_restore(lcdc_dev);
+        rk3288_lcdc_reg_restore(lcdc_dev);
 		/*if (dev_drv->iommu_enabled)
 		   rk3368_lcdc_mmu_en(dev_drv); */
 		if ((support_uboot_display()&&(lcdc_dev->prop == PRMRY))) {
@@ -1487,6 +1517,7 @@ static int rk3288_lcdc_open(struct rk_lcdc_driver *dev_drv, int win_id,
 		} else {
 			rk3288_load_screen(dev_drv, 1);
 		}
+        
 		if (dev_drv->bcsh.enable)
 			rk3288_lcdc_set_bcsh(dev_drv, 1);
 		spin_lock(&lcdc_dev->reg_lock);
@@ -4053,7 +4084,10 @@ static int rk3288_lcdc_probe(struct platform_device *pdev)
 	lcdc_dev->screen = dev_drv->screen0;
 	dev_info(dev, "lcdc%d probe ok, iommu %s\n",
 		lcdc_dev->id, dev_drv->iommu_enabled ? "enabled" : "disabled");
-
+    //rk3288_lcdc_blank(dev_drv,0,FB_BLANK_NORMAL);
+    //rk3288_lcdc_blank(dev_drv,1,FB_BLANK_NORMAL);
+    //rk3288_lcdc_blank(dev_drv,2,FB_BLANK_NORMAL);
+    //rk3288_lcdc_blank(dev_drv,3,FB_BLANK_NORMAL);
 	return 0;
 }
 

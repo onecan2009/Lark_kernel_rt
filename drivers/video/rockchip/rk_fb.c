@@ -73,6 +73,7 @@ extern phys_addr_t uboot_logo_base;
 extern phys_addr_t uboot_logo_size;
 extern phys_addr_t uboot_logo_offset;
 extern char *disppara ; /*uboot parmeters*/
+extern int bRotate;     /*是否logo旋转*/
 static struct rk_fb_trsm_ops *trsm_lvds_ops;
 static struct rk_fb_trsm_ops *trsm_edp_ops;
 static struct rk_fb_trsm_ops *trsm_mipi_ops;
@@ -92,7 +93,7 @@ static int rk_fb_config_debug(struct rk_lcdc_driver *dev_drv,
 			      struct rk_fb_reg_data *regs, u32 cmd);
 int support_uboot_display(void)
 {
-	//return uboot_logo_on;
+	// return uboot_logo_on;
     
     /*
      * 在dts将uboot_logo_on置1时，此处如果返回uboot_logo_on，将造成系统启动VGA显示的问题，
@@ -509,26 +510,30 @@ int rk_fb_video_mode_from_timing(const struct display_timing *dt,
  * 1440x900 [5] 
  * */
 static char* lcd_dts_timings[] = {
-    "1280x720",
-    "1920x1080",
-    "3840x2160",
+    "640x480",
+    "800x600",
     "1024x768",
+    "1280x720",
+    "1280x1024",
     "1366x768",
-    "1440x900"
+    "1440x900",
+    "1600x900",
+    "1680x1050",
+    "1920x1080"
     };
     
 static int parse_disp(char *disppara)
 {
     int i = 0;
-    printk("%s(),disp is %s\n",__func__,disppara);
+    //printk("%s(),disp is %s\n",__func__,disppara);
     /*  
      * 假设没有解析出参数区的分辨率参数，
-     * 则设成1024x768，native-mode = 3
+     * 则设成1024x768，native-mode = 2
      */
     if(disppara == NULL)
     {
-            printk("disp is  NULL,disp setup default 1024x768\n");
-            return 3;
+    //        printk("disp is  NULL,disp setup default 1024x768\n");
+            return 2;
     }
     else
     {
@@ -540,16 +545,32 @@ static int parse_disp(char *disppara)
             }
         }
         
-        printk("disp is parse error,disp setup default 1024x768\n");
-        return 3;
+    //    printk("disp is parse error,disp setup default 1024x768\n");
+        return 2;
     }
 }
 
+int Is_Screen_Rotate(void)
+{
+    //printk("in %s()\n",__func__);
+    if(bRotate == 1)
+    {
+        //printk("the screen is rotated....\n");
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 
+}
+//extern int dts_best_timings(void);
 int rk_fb_prase_timing_dt(struct device_node *np, struct rk_screen *screen)
 {
 	struct display_timings *disp_timing;
 	struct display_timing *dt;
+    unsigned int dst_id = 0;
+    
 	disp_timing = of_get_display_timings(np);
 	if (!disp_timing) {
 		pr_err("parse display timing err\n");
@@ -563,8 +584,17 @@ int rk_fb_prase_timing_dt(struct device_node *np, struct rk_screen *screen)
     //disp_timing->native_mode = parse_disp(disppara);
     //printk("%s(),disp_timing->native_mode is %d,the resolution is %s\n",\
             //__func__,disp_timing->native_mode,lcd_dts_timings[disp_timing->native_mode]);
+    
+    // 解析得到分辨率
+    dst_id = parse_disp(disppara);
+    if(dst_id >= 0 && dst_id < 10)
+    {
+        disp_timing->native_mode = dst_id ;
+    }
+    //printk("dst_id is %d,fb set %s\n",dst_id,lcd_dts_timings[dst_id]);
 	dt = display_timings_get(disp_timing, disp_timing->native_mode);
 	rk_fb_video_mode_from_timing(dt, screen);
+    //printk("dts_best_timings is %d\n",dts_best_timings());
 	return 0;
 
 }
@@ -3481,7 +3511,8 @@ int rk_fb_switch_screen(struct rk_screen *screen, int enable, int lcdc_id)
 
 	if (unlikely(!rk_fb) || unlikely(!screen))
 		return -ENODEV;
-
+    
+    
 	/* get lcdc driver */
 	sprintf(name, "lcdc%d", lcdc_id);
 	if (rk_fb->disp_mode != DUAL)
@@ -3847,7 +3878,10 @@ static int rk_fb_alloc_buffer(struct fb_info *fbi)
 		fb_mem_size = get_fb_size(dev_drv->reserved_fb);
 #if defined(CONFIG_ION_ROCKCHIP)
 		if (rk_fb_alloc_buffer_by_ion(fbi, win, fb_mem_size) < 0)
-			return -ENOMEM;
+        {
+			printk("rk_fb_alloc_buffer_by_ion error\n");
+            return -ENOMEM;
+        }
 #else
 		fb_mem_virt = dma_alloc_writecombine(fbi->dev, fb_mem_size,
 						     &fb_mem_phys, GFP_KERNEL);
@@ -3865,6 +3899,7 @@ static int rk_fb_alloc_buffer(struct fb_info *fbi)
 		fbi->fix.smem_start = rk_fb->fb[0]->fix.smem_start;
 		fbi->fix.smem_len = rk_fb->fb[0]->fix.smem_len;
 		fbi->screen_base = rk_fb->fb[0]->screen_base;
+        memset(fbi->screen_base, 0, fbi->fix.smem_len);
 	}
 
 	fbi->screen_size = fbi->fix.smem_len;
@@ -4072,11 +4107,12 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 		fb_videomode_to_var(&fbi->var, &dev_drv->cur_screen->mode);
 		fbi->var.grayscale |=
 		    (fbi->var.xres << 8) + (fbi->var.yres << 20);
-//#if defined(CONFIG_LOGO_LINUX_BMP)
-		//fbi->var.bits_per_pixel = 32;
-//#else
+#if defined(CONFIG_LOGO_LINUX_BMP)
+		fbi->var.bits_per_pixel = 32;
+#else
 		//fbi->var.bits_per_pixel = 16;
-//#endif
+		fbi->var.bits_per_pixel = 32;
+#endif
 		fbi->fix.line_length =
 		    (fbi->var.xres_virtual) * (fbi->var.bits_per_pixel >> 3);
 		fbi->var.width = dev_drv->cur_screen->width;
@@ -4148,6 +4184,7 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 		int format;
 		u32 dsp_addr;
 		struct fb_info *main_fbi = rk_fb->fb[0];
+        //memset(main_fbi->screen_base,0x0,main_fbi->fix.smem_len); 
 		main_fbi->fbops->fb_open(main_fbi, 2);
 		main_fbi->var.pixclock = dev_drv->pixclock;
 //#if defined(CONFIG_ROCKCHIP_IOMMU)
@@ -4190,7 +4227,6 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 				       uboot_logo_offset));
 				return -1;
 			}
-
 			if(bmpdecoder(vaddr, main_fbi->screen_base, &width,
 				      &height, &bits)) {
 				kfree(pages);
@@ -4205,6 +4241,7 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 					xact, yact, width, height);
 				return 0;
 			}
+            
 			local_irq_save(flags);
 			if (dev_drv->ops->wait_frame_start)
 				dev_drv->ops->wait_frame_start(dev_drv, 0);
@@ -4276,7 +4313,7 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 			local_irq_restore(flags);
 			return 0;
 		} else {
-			if (dev_drv->iommu_enabled) {
+			if (dev_drv->iommu_enabled) {// 0
 				if (dev_drv->ops->mmu_en)
 					dev_drv->ops->mmu_en(dev_drv);
 				freed_index = 0;
@@ -4290,6 +4327,7 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 			fb_show_bmp_logo(main_fbi, FB_ROTATE_UR);
 		}
 #else
+        
 		if (fb_prepare_logo(main_fbi, FB_ROTATE_UR)) {
 			fb_set_cmap(&main_fbi->cmap, main_fbi);
 			fb_show_logo(main_fbi, FB_ROTATE_UR);
@@ -4366,8 +4404,12 @@ static int rk_fb_probe(struct platform_device *pdev)
 	}
 
 	if (!of_property_read_u32(np, "rockchip,uboot-logo-on", &uboot_logo_on))
-		printk(KERN_DEBUG "uboot-logo-on:%d\n", uboot_logo_on);
-
+    {
+        printk(KERN_DEBUG "uboot-logo-on:%d\n", uboot_logo_on);
+        uboot_logo_on = 0;
+        printk(KERN_DEBUG "fixed uboot-logo-on:%d\n", uboot_logo_on);
+    }
+    
 	dev_set_name(&pdev->dev, "rockchip-fb");
 #if defined(CONFIG_ION_ROCKCHIP)
 	rk_fb->ion_client = rockchip_ion_client_create("rk_fb");

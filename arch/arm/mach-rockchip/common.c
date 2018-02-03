@@ -334,10 +334,11 @@ static int __init rockchip_uboot_logo_setup(char *p)
 
 	pr_info("%s: mem: %pa@%pa, offset:%pa\n", __func__,
 		&uboot_logo_size, &uboot_logo_base, &uboot_logo_offset);
-
+    //printk("uboot_logo_base:%x  uboot_logo_size :%x",uboot_logo_base,uboot_logo_size);
+    //memset((unsigned char *)uboot_logo_base,0x0,uboot_logo_size);
 	return 0;
 }
-early_param("uboot_logo", rockchip_uboot_logo_setup);
+//early_param("uboot_logo", rockchip_uboot_logo_setup);
 
 static int __init rockchip_uboot_mem_late_init(void)
 {

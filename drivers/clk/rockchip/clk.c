@@ -2074,8 +2074,9 @@ static void __init rk_get_uboot_display_flag(void)
 
        node = of_find_node_by_name(NULL, "fb");
        if (node)
-               of_property_read_u32(node, "rockchip,uboot-logo-on", &uboot_logo_on);
-
+            of_property_read_u32(node, "rockchip,uboot-logo-on", &uboot_logo_on);
+       //
+       uboot_logo_on = 0; 
        printk("%s: uboot_logo_on = %d\n", __FUNCTION__, uboot_logo_on);
 }
 
@@ -2173,7 +2174,7 @@ void __init rkclk_init_clks(struct device_node *np)
 		if (clk_name==NULL)
 			continue;
 
-		if (uboot_logo_on && rkclk_uboot_has_init(np, clk_name)) {
+		if (rkclk_uboot_has_init(np, clk_name) && uboot_logo_on ) {
 			printk("%s: %s has been inited in uboot, ingored\n", 
 				__FUNCTION__, clk_name);
 			continue;
