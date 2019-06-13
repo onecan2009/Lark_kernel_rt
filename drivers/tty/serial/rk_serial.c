@@ -1426,6 +1426,17 @@ serial_rk_set_termios(struct uart_port *port, struct ktermios *termios,
 	baud = uart_get_baud_rate(port, termios, old,
 				  port->uartclk / 16 / 0xffff,
 				  port->uartclk / 16);
+
+    if ( port->baud > 0 && port->line != 0)
+     {
+         baud = port->baud;
+         printk("%d, baud is:%d\n",port->line,baud);
+     }
+    else
+     {
+        printk("%d,baud is:%d\n",port->line,baud);
+     }
+
 	quot = uart_get_divisor(port, baud);
     printk("in %s(),baud:%d,quot:%d\n",__func__,baud,quot);
     printk("in %s(),port->irq:%d,port->iobase:%p\n",__func__,port->irq,port->iobase);
@@ -1433,7 +1444,7 @@ serial_rk_set_termios(struct uart_port *port, struct ktermios *termios,
     if(0 && port->iobase == 0xff1b0000)  //强制将ttyS3的波特率写成460800
     {
         printk("force set baud in %s()....\n",__func__);
-        WARN_ON(1);
+        //WARN_ON(1);
         baud = 460800;                  //波特率
         quot = 3;                       //分频系数
     }
