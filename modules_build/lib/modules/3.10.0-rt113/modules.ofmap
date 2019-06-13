@@ -1,3 +1,0 @@
-# of module          name                 type                 compatible
-mali_kbase           *                    *                    arm,malit7xx
-mali_kbase           *                    *                    arm,mali-midgard

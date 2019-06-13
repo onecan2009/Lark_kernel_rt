@@ -929,6 +929,8 @@ static int var_to_display(struct display *disp,
 static void display_to_var(struct fb_var_screeninfo *var,
 			   struct display *disp)
 {
+    //dump_stack();
+    printk("var is %p,disp is %p,disp->mode is %p\n",var,disp,disp->mode);
 	fb_videomode_to_var(var, disp->mode);
 	var->xres_virtual = disp->xres_virtual;
 	var->yres_virtual = disp->yres_virtual;
@@ -1068,7 +1070,11 @@ static void fbcon_init(struct vc_data *vc, int init)
 		logo = 0;
 
 	if (var_to_display(p, &info->var, info))
-		return;
+    {
+        	printk("var_to_display error\n");
+        	return;
+    }
+	
 
 	if (!info->fbcon_par)
 		con2fb_acquire_newinfo(vc, info, vc->vc_num, -1);

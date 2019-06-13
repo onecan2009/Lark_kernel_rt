@@ -962,9 +962,33 @@ const struct fb_videomode *fb_match_mode(const struct fb_var_screeninfo *var,
 	struct fb_videomode *m, mode;
 
 	fb_var_to_videomode(&mode, var);
+    printk("mode.xres = %d\n",mode.xres);
+    printk("mode.yres = %d\n",mode.yres);
+    printk("mode.pixclock = %d\n",mode.pixclock);
+    printk("mode.left_margin = %d\n",mode.left_margin);
+    printk("mode.right_margin = %d\n",mode.right_margin);
+    printk("mode.upper_margin = %d\n",mode.upper_margin);
+    printk("mode.hsync_len = %d\n",mode.hsync_len);
+    printk("mode.vsync_len = %d\n",mode.vsync_len);
+    printk("mode.sync = %d\n",mode.sync);
+    printk("mode.vmode = %d\n",mode.vmode);
+    printk("mode.flag = %d\n",mode.flag);
 	list_for_each(pos, head) {
 		modelist = list_entry(pos, struct fb_modelist, list);
 		m = &modelist->mode;
+        printk("name is %s\n",m->name);
+		printk("refresh is %d\n",m->refresh);
+        printk("m->xres = %d\n",m->xres);
+        printk("m->yres = %d\n",m->yres);
+        printk("m->pixclock = %d\n",m->pixclock);
+        printk("m->left_margin = %d\n",m->left_margin);
+        printk("m->right_margin = %d\n",m->right_margin);
+        printk("m->upper_margin = %d\n",m->upper_margin);
+        printk("m->hsync_len = %d\n",m->hsync_len);
+        printk("m->vsync_len = %d\n",m->vsync_len);
+        printk("m->sync = %d\n",m->sync);
+        printk("m->vmode = %d\n",m->vmode);
+        printk("m->flag = %d\n",m->flag);
 		if (fb_mode_is_equal(m, &mode))
 			return m;
 	}

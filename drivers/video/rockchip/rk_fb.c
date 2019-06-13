@@ -4105,6 +4105,9 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 		fbi->fix = def_fix;
 		sprintf(fbi->fix.id, "fb%d", rk_fb->num_fb);
 		fb_videomode_to_var(&fbi->var, &dev_drv->cur_screen->mode);
+        printk("dev_drv->cur_screen->mode.pixclock = %d\n",dev_drv->cur_screen->mode.pixclock);
+        printk("fbi->var.pixclock = %d\n",fbi->var.pixclock);
+        dev_drv->cur_screen->mode.pixclock = 65000000;
 		fbi->var.grayscale |=
 		    (fbi->var.xres << 8) + (fbi->var.yres << 20);
 #if defined(CONFIG_LOGO_LINUX_BMP)
@@ -4117,6 +4120,7 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 		    (fbi->var.xres_virtual) * (fbi->var.bits_per_pixel >> 3);
 		fbi->var.width = dev_drv->cur_screen->width;
 		fbi->var.height = dev_drv->cur_screen->height;
+        fbi->var.pixclock = dev_drv->pixclock;
 		if (dev_drv->iommu_enabled)
 			fb_ops.fb_mmap = rk_fb_mmap;
 		fbi->fbops = &fb_ops;
@@ -4178,7 +4182,8 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 	}
 
 	/* show logo for primary display device */
-#if !defined(CONFIG_FRAMEBUFFER_CONSOLE)
+//#if !defined(CONFIG_FRAMEBUFFER_CONSOLE)
+#if defined(CONFIG_LOGO)
 	if (dev_drv->prop == PRMRY) {
 		u16 xact, yact;
 		int format;
@@ -4186,7 +4191,7 @@ int rk_fb_register(struct rk_lcdc_driver *dev_drv,
 		struct fb_info *main_fbi = rk_fb->fb[0];
         //memset(main_fbi->screen_base,0x0,main_fbi->fix.smem_len); 
 		main_fbi->fbops->fb_open(main_fbi, 2);
-		main_fbi->var.pixclock = dev_drv->pixclock;
+		//main_fbi->var.pixclock = dev_drv->pixclock;
 //#if defined(CONFIG_ROCKCHIP_IOMMU)
 		//if (dev_drv->iommu_enabled) {
 			//if (dev_drv->mmu_dev)

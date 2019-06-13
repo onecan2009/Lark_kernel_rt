@@ -342,7 +342,9 @@ kernel.img: zImage
 
 LOGO := $(notdir $(wildcard $(srctree)/logo.bmp))
 RLOGO := $(notdir $(wildcard $(srctree)/rlogo.bmp))
+WAITLOGO := $(notdir $(wildcard $(srctree)/waitlogo.bmp))
 LOGO_KERNEL := $(notdir $(wildcard $(srctree)/logo_kernel.bmp))
-%.img: %.dtb kernel.img $(LOGO) $(LOGO_KERNEL) $(RLOGO)
-	$(Q)$(srctree)/resource_tool $(objtree)/arch/arm/boot/dts/$*.dtb $(LOGO) $(LOGO_KERNEL) $(RLOGO)
-	@echo '  Image:  resource.img (with $*.dtb $(LOGO) $(LOGO_KERNEL) $(RLOGO)) is ready'
+
+%.img: %.dtb kernel.img $(LOGO) $(LOGO_KERNEL) $(RLOGO) $(WAITLOGO)
+	$(Q)$(srctree)/resource_tool $(objtree)/arch/arm/boot/dts/$*.dtb $(LOGO) $(LOGO_KERNEL) $(RLOGO) $(WAITLOGO)
+	@echo '  Image:  resource.img (with $*.dtb $(LOGO) $(LOGO_KERNEL) $(RLOGO) $(WAITLOGO)) is ready'

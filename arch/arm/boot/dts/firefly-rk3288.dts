@@ -198,6 +198,10 @@
 		rockchip,usb_irq_wakeup;
 	};
 };
+&gmac_clkin {
+		//clock-frequency = <1250000000>;
+		clock-frequency = <50000000>;
+};
 
 &gmac {
 //	pmu_regulator = "act_ldo5";
@@ -206,7 +210,6 @@
 	reset-gpio = <&gpio4 GPIO_B0 GPIO_ACTIVE_LOW>;
 	phy-mode = "rmii";
 	clock_in_out = "input";
-	//clock_in_out = "output";
 	tx_delay = <0x30>;
 	rx_delay = <0x20>;
 };
